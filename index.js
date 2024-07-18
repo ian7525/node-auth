@@ -17,6 +17,12 @@ app.use(
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
+const authRoute = require('./routes/auth.route')
+const userRoute = require('./routes/user.route')
+
+app.use('/auth', authRoute)
+app.use('/user', userRoute)
+
 app.get('/health', (req, res) => {
   res.status(200).json({ message: 'OK' })
 })

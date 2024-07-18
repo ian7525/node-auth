@@ -1,8 +1,7 @@
-const { Op } = require('sequelize')
-
 const db = require('../models')
 const ROLES = db.ROLES
 const User = db.user
+const Op = db.Sequelize.Op
 
 const checkDuplicate = async (req, res, next) => {
   const user = await User.findOne({
