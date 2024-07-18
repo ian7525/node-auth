@@ -11,6 +11,6 @@ router.post(
   [verifySignup.checkDuplicate, verifySignup.checkRoleExisted],
   controller.signup
 )
-router.post('/signup', controller.signin)
+router.post('/signin', controller.signin)
 
 module.exports = router

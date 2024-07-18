@@ -13,7 +13,7 @@ const signup = async (req, res) => {
 
   try {
     //Save user
-    const savedUser = User.create({
+    const savedUser = await User.create({
       username,
       email,
       password: bcrypt.hashSync(password),
@@ -61,7 +61,7 @@ const signin = async (req, res) => {
     const authorities = []
     const userRoles = await user.getRoles()
     for (let userRole of userRoles) {
-      authorities.push(`ROLE_${userRole.toUpperCase()}`)
+      authorities.push(`ROLE_${userRole.name.toUpperCase()}`)
     }
 
     res.status(200).json({
