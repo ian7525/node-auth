@@ -17,7 +17,7 @@ const db = {
   sequelize,
   user: require('../models/user.model')(sequelize, Sequelize),
   role: require('../models/role.model')(sequelize, Sequelize),
-  ROLE: ['user', 'admin', 'moderator'],
+  ROLES: ['user', 'admin', 'moderator'],
 }
 
 db.role.belongsToMany(db.user, {
