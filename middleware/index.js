@@ -1,7 +1,4 @@
-const auth = require('./auth')
-const verifySignup = require('./verifySignup')
+import authMw from './authMw.js'
+import verifySignupMw from './verifySignupMw.js'
 
-module.exports = {
-  auth,
-  verifySignup,
-}
+export { authMw, verifySignupMw }

@@ -1,12 +1,13 @@
-const db = require('../models')
-const ROLES = db.ROLES
-const User = db.user
-const Op = db.Sequelize.Op
+import db from '../models/index.js'
 
 const checkDuplicate = async (req, res, next) => {
+  const { user: User, Sequelize } = db
   const user = await User.findOne({
     where: {
-      [Op.or]: [{ username: req.body.userName }, { email: req.body.email }],
+      [Sequelize.Op.or]: [
+        { username: req.body.userName },
+        { email: req.body.email },
+      ],
     },
   })
 
@@ -19,9 +20,11 @@ const checkDuplicate = async (req, res, next) => {
 }
 
 const checkRoleExisted = (req, res, next) => {
-  if (req.body.roles) {
-    for (let role of req.body.roles) {
-      if (!ROLES.includes(role)) {
+  const { roles } = req.body
+
+  if (roles) {
+    for (let role of roles) {
+      if (!db.ROLES.includes(role)) {
         res.status(400).json({ message: `Failed! Role doesn't exist: ${role}` })
         return
       }
@@ -30,7 +33,7 @@ const checkRoleExisted = (req, res, next) => {
   next()
 }
 
-module.exports = {
+export default {
   checkDuplicate,
   checkRoleExisted,
 }

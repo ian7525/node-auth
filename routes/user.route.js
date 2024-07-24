@@ -1,18 +1,19 @@
-const express = require('express')
+import express from 'express'
 
-const { auth } = require('../middleware')
+import {
+  allAccess,
+  userBoard,
+  adminBoard,
+} from '../controllers/user.controller.js'
 
-const controller = require('../controllers/user.controller')
+import { authMw } from '../middleware/index.js'
 
 const router = express.Router()
 
-router.get('/all', controller.allAccess)
-router.get('/user', [auth.verifyToken], controller.userBoard)
-router.get(
-  '/mod',
-  [auth.verifyToken, auth.isModerator],
-  controller.moderatorBoard
-)
-router.get('/admin', [auth.verifyToken, auth.isAdmin], controller.adminBoard)
+router.get('/all', allAccess)
 
-module.exports = router
+router.get('/user', [authMw.verifyToken], userBoard)
+
+router.get('/admin', [authMw.verifyToken, authMw.isAdmin], adminBoard)
+
+export default router

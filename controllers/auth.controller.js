@@ -1,18 +1,14 @@
-const jwt = require('jsonwebtoken')
-const bcrypt = require('bcryptjs')
+import jwt from 'jsonwebtoken'
+import bcrypt from 'bcryptjs'
 
-const config = require('../config/auth.config')
-const db = require('../models')
-const User = db.user
-const Role = db.role
+import AuthConfig from '../config/auth.config.js'
+import db from '../models/index.js'
 
-const Op = db.Sequelize.Op
-
-const signup = async (req, res) => {
+export const signup = async (req, res) => {
   const { userName: username, email, password, roles = [] } = req.body
+  const { user: User, role: Role } = db
 
   try {
-    //Save user
     const savedUser = await User.create({
       username,
       email,
@@ -23,7 +19,7 @@ const signup = async (req, res) => {
       const dbRoles = await Role.findAll({
         where: {
           name: {
-            [Op.or]: roles,
+            [db.Sequelize.Op.or]: roles,
           },
         },
       })
@@ -37,11 +33,13 @@ const signup = async (req, res) => {
   }
 }
 
-const signin = async (req, res) => {
+export const signin = async (req, res) => {
   const { userName: username, password } = req.body
+  const { user: User } = db
 
   try {
     const user = await User.findOne({ where: { username } })
+    console.log('user=', user)
     if (!user) {
       return res.status(404).json({ message: 'User not found!' })
     }
@@ -52,7 +50,7 @@ const signin = async (req, res) => {
       return res.status(401).json({ message: 'Invalid login!' })
     }
 
-    const accessToken = jwt.sign({ id: user.id }, config.secret, {
+    const accessToken = jwt.sign({ id: user.id }, AuthConfig.secret, {
       algorithm: 'HS256',
       allowInsecureKeySizes: true,
       expiresIn: 86400, // 1 day
@@ -74,9 +72,4 @@ const signin = async (req, res) => {
   } catch (e) {
     res.status(500).json({ message: e.message })
   }
-}
-
-module.exports = {
-  signup,
-  signin,
 }

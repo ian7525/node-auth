@@ -1,16 +1,17 @@
-const express = require('express')
+import express from 'express'
 
-const { verifySignup } = require('../middleware')
+import { signup, signin } from '../controllers/auth.controller.js'
 
-const controller = require('../controllers/auth.controller')
+import { verifySignupMw } from '../middleware/index.js'
 
 const router = express.Router()
 
 router.post(
   '/signup',
-  [verifySignup.checkDuplicate, verifySignup.checkRoleExisted],
-  controller.signup
+  [verifySignupMw.checkDuplicate, verifySignupMw.checkRoleExisted],
+  signup
 )
-router.post('/signin', controller.signin)
 
-module.exports = router
+router.post('/signin', signin)
+
+export default router

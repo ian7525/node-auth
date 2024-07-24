@@ -1,13 +1,15 @@
-module.exports = (sequelize, Sequelize) => {
+const RoleModel = (sequelize, dataTypes) => {
   const Role = sequelize.define('role', {
     id: {
-      type: Sequelize.INTEGER,
+      type: dataTypes.INTEGER,
       primaryKey: true,
     },
     name: {
-      type: Sequelize.STRING,
+      type: dataTypes.STRING,
     },
   })
 
   return Role
 }
+
+export default RoleModel

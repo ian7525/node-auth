@@ -1,23 +1,30 @@
-const config = require('../config/db.config')
+import Sequelize from 'sequelize'
 
-const Sequelize = require('sequelize')
-const sequelize = new Sequelize(config.DB, config.USER, config.PASSWORD, {
-  host: config.HOST,
-  dialect: config.dialect,
+import UserModel from '../models/user.model.js'
+import RoleModel from '../models/role.model.js'
+
+import DDD from '../config/db.config.js'
+
+const { database, user, password, host, dialect, pool } = DDD
+const { max, min, acquire, idle } = pool
+
+const sequelize = new Sequelize(database, user, password, {
+  host,
+  dialect,
   pool: {
-    max: config.pool.max,
-    min: config.pool.min,
-    acquire: config.pool.acquire,
-    idle: config.pool.idle,
+    max,
+    min,
+    acquire,
+    idle,
   },
 })
 
 const db = {
   Sequelize,
   sequelize,
-  user: require('../models/user.model')(sequelize, Sequelize),
-  role: require('../models/role.model')(sequelize, Sequelize),
-  ROLES: ['user', 'admin', 'moderator'],
+  user: UserModel(sequelize, Sequelize.DataTypes),
+  role: RoleModel(sequelize, Sequelize.DataTypes),
+  roles: ['user', 'admin'],
 }
 
 db.role.belongsToMany(db.user, {
@@ -28,4 +35,4 @@ db.user.belongsToMany(db.role, {
   through: 'user_roles',
 })
 
-module.exports = db
+export default db
