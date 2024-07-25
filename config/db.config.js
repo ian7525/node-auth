@@ -1,7 +1,7 @@
-export default {
+export default () => ({
   host: process.env.DB_HOST || 'localhost',
   user: process.env.DB_USER || 'postgres',
-  password: process.env.DB_PWD || 'postgres',
+  password: process.env.DB_PWD || '',
   database: process.env.DB_DATABASE || 'postgres',
   dialect: process.env.DB_DIALECT || 'postgres',
   pool: {
@@ -10,4 +10,4 @@ export default {
     acquire: +process.env.DB_POOL_ACQUIRE || 30000,
     idle: +process.env.DB_POOL_IDLE || 10000,
   },
-}
+})

@@ -1,14 +1,15 @@
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcryptjs'
 
-import AuthConfig from '../config/auth.config.js'
-import db from '../models/index.js'
+import authConfig from '../config/auth.config.js'
+import { getDb } from '../models/index.js'
 
 export const signup = async (req, res) => {
   const { userName: username, email, password, roles = [] } = req.body
-  const { user: User, role: Role } = db
 
   try {
+    const db = getDb()
+    const { user: User, role: Role } = db
     const savedUser = await User.create({
       username,
       email,
@@ -35,11 +36,11 @@ export const signup = async (req, res) => {
 
 export const signin = async (req, res) => {
   const { userName: username, password } = req.body
-  const { user: User } = db
 
   try {
+    const db = getDb()
+    const { user: User } = db
     const user = await User.findOne({ where: { username } })
-    console.log('user=', user)
     if (!user) {
       return res.status(404).json({ message: 'User not found!' })
     }
@@ -50,7 +51,8 @@ export const signin = async (req, res) => {
       return res.status(401).json({ message: 'Invalid login!' })
     }
 
-    const accessToken = jwt.sign({ id: user.id }, AuthConfig.secret, {
+    const { secret } = authConfig()
+    const accessToken = jwt.sign({ id: user.id }, secret, {
       algorithm: 'HS256',
       allowInsecureKeySizes: true,
       expiresIn: 86400, // 1 day

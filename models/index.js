@@ -3,36 +3,53 @@ import Sequelize from 'sequelize'
 import UserModel from '../models/user.model.js'
 import RoleModel from '../models/role.model.js'
 
-import DDD from '../config/db.config.js'
+let db = null
 
-const { database, user, password, host, dialect, pool } = DDD
-const { max, min, acquire, idle } = pool
+const dbInit = (config) => {
+  if (!config) {
+    throw new Error('Config is required')
+  }
 
-const sequelize = new Sequelize(database, user, password, {
-  host,
-  dialect,
-  pool: {
-    max,
-    min,
-    acquire,
-    idle,
-  },
-})
+  const { database, user, password, host, dialect, pool } = config
+  const { max, min, acquire, idle } = pool
 
-const db = {
-  Sequelize,
-  sequelize,
-  user: UserModel(sequelize, Sequelize.DataTypes),
-  role: RoleModel(sequelize, Sequelize.DataTypes),
-  roles: ['user', 'admin'],
+  const sequelize = new Sequelize(database, user, password, {
+    host,
+    dialect,
+    pool: {
+      max,
+      min,
+      acquire,
+      idle,
+    },
+  })
+
+  db = {
+    Sequelize,
+    sequelize,
+    user: UserModel(sequelize, Sequelize.DataTypes),
+    role: RoleModel(sequelize, Sequelize.DataTypes),
+    roles: ['user', 'admin'],
+  }
+
+  db.role.belongsToMany(db.user, {
+    through: 'user_roles',
+  })
+
+  db.user.belongsToMany(db.role, {
+    through: 'user_roles',
+  })
+
+  db.sequelize.sync()
+
+  return db
 }
 
-db.role.belongsToMany(db.user, {
-  through: 'user_roles',
-})
+function getDb() {
+  if (!db) {
+    throw new Error('Db is not initialized')
+  }
+  return db
+}
 
-db.user.belongsToMany(db.role, {
-  through: 'user_roles',
-})
-
-export default db
+export { dbInit, getDb }

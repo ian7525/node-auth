@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken'
 import AuthConfig from '../config/auth.config.js'
-import db from '../models/index.js'
+import { getDb } from '../models/index.js'
 
 const verifyToken = async (req, res, next) => {
   const token = req.headers['authorization'].split(' ')[1]
@@ -19,16 +19,20 @@ const verifyToken = async (req, res, next) => {
 }
 
 const isAdmin = async (req, res, next) => {
-  const user = await db.user.findByPk(req.userId)
-  const roles = await user.getRoles()
-  for (let role of roles) {
-    if (role.name === 'admin') {
-      next()
-      return
+  try {
+    const db = getDb()
+    const user = await db.user.findByPk(req.userId)
+    const roles = await user.getRoles()
+    for (let role of roles) {
+      if (role.name === 'admin') {
+        next()
+        return
+      }
     }
+    return res.status(403).json({ message: 'Require Admin Role!' })
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal Server Error' })
   }
-
-  return res.status(403).json({ message: 'Require Admin Role!' })
 }
 
 export default {
