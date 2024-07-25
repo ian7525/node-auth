@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken'
 import bcrypt from 'bcryptjs'
 
 import authConfig from '../config/auth.config.js'
+import emailUtils from '../utils/emailUtils.js'
 import { getDb } from '../models/index.js'
 
 export const signup = async (req, res) => {
@@ -28,7 +29,14 @@ export const signup = async (req, res) => {
     } else {
       await savedUser.setRoles([1])
     }
-    res.status(201).json({ message: 'User is registered successfully!' })
+
+    const emailUtil = emailUtils()
+    const response = await emailUtil.registerEmail(email)
+    if (response.isSuccess) {
+      res.status(201).json({ message: 'User is registered successfully!' })
+    } else {
+      res.status(500).json({ message: 'User is registered failed!' })
+    }
   } catch (e) {
     res.status(500).json({ message: e.message })
   }

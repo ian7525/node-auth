@@ -9,7 +9,7 @@ const UserModel = (sequelize, dataTypes) => {
     password: {
       type: dataTypes.STRING,
     },
-    isActive: {
+    isactive: {
       type: dataTypes.BOOLEAN,
       defaultValue: false,
     },
